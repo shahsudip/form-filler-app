@@ -5,12 +5,6 @@ class UploadResponse(BaseModel):
     filename: str = Field(..., description="Name of the uploaded and cached PDF file")
     total_pages: int = Field(..., description="Total number of pages in the PDF file")
 
-class PdfHistoryItem(BaseModel):
-    filename: str = Field(..., description="Name of the PDF file in cache")
-    total_pages: int = Field(..., description="Total number of pages")
-    uploaded_at: str = Field(..., description="ISO 8601 timestamp when first uploaded")
-    file_size_bytes: int = Field(..., description="File size in bytes")
-
 class FormField(BaseModel):
     id: str = Field(..., description="Unique ID for the field")
     type: str = Field(..., description="Type of the field: 'digital' or 'visual'")
@@ -22,6 +16,7 @@ class FormField(BaseModel):
 
 class FormFillerUploadResponse(BaseModel):
     filename: str = Field(..., description="Cached PDF filename")
+    total_pages: int = Field(1, description="Total number of pages in the PDF file")
     fields: List[FormField] = Field(..., description="Detected fields and questions")
 
 class AnswerItem(BaseModel):

@@ -15,7 +15,6 @@ from starlette.concurrency import run_in_threadpool
 
 from app.schemas import (
     UploadResponse,
-    PdfHistoryItem,
     FormFillerUploadResponse,
     FormField,
     FormFillerFillRequest,
@@ -56,61 +55,10 @@ os.makedirs(CACHE_DIR, exist_ok=True)
 # Module-level ProfileVectorStore (index rebuilt lazily when profile changes)
 _profile_store = ProfileVectorStore(profile_dir=CACHE_DIR)
 
-
-def _load_history() -> list:
-    if not os.path.exists(HISTORY_FILE):
-        return []
-    try:
-        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return []
-
-
-def _save_history(history: list):
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(history, f, ensure_ascii=False, indent=2)
-
-
-def _add_to_history(filename: str, total_pages: int, file_size_bytes: int):
-    history = _load_history()
-    # Update existing entry if same filename, else prepend new entry
-    history = [h for h in history if h.get("filename") != filename]
-    history.insert(0, {
-        "filename": filename,
-        "total_pages": total_pages,
-        "uploaded_at": datetime.now(timezone.utc).isoformat(),
-        "file_size_bytes": file_size_bytes,
-    })
-    _save_history(history)
-
-
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Simple health check endpoint."""
     return {"status": "healthy"}
-
-
-@app.get("/pdf-history", tags=["History"])
-async def get_pdf_history():
-    """Returns list of previously uploaded PDFs that are still in cache."""
-    history = _load_history()
-    # Filter to only PDFs that still physically exist in the cache
-    valid = [h for h in history if os.path.exists(os.path.join(CACHE_DIR, os.path.basename(h["filename"])))]
-    if len(valid) != len(history):
-        _save_history(valid)
-    return {"history": valid}
-
-
-@app.post("/select-pdf", response_model=UploadResponse, tags=["History"])
-async def select_pdf_from_history(filename: str = Query(..., description="Filename from history to open")):
-    """Opens an already-cached PDF from history without re-uploading."""
-    safe_filename = os.path.basename(filename)
-    file_path = os.path.join(CACHE_DIR, safe_filename)
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="PDF not found in cache. Please upload it again.")
-    total_pages = get_pdf_page_count(file_path)
-    return UploadResponse(filename=safe_filename, total_pages=total_pages)
 
 
 async def _process_upload_to_pdf(file: UploadFile) -> tuple[str, str]:
@@ -146,7 +94,6 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         total_pages = get_pdf_page_count(dest_path)
         file_size_bytes = os.path.getsize(dest_path)
-        _add_to_history(filename, total_pages, file_size_bytes)
 
         return UploadResponse(filename=filename, total_pages=total_pages)
     except Exception as e:
@@ -304,10 +251,7 @@ async def form_filler_upload(file: UploadFile = File(...)):
         # Run field detection in background thread
         detected_fields = await run_in_threadpool(detect_fields, dest_path)
         
-        # Populate history
         total_pages = get_pdf_page_count(dest_path)
-        file_size_bytes = os.path.getsize(dest_path)
-        _add_to_history(filename, total_pages, file_size_bytes)
 
         # Generate questions
         fields_response = []
@@ -332,7 +276,7 @@ async def form_filler_upload(file: UploadFile = File(...)):
                 )
             )
 
-        resp = FormFillerUploadResponse(filename=filename, fields=fields_response)
+        resp = FormFillerUploadResponse(filename=filename, total_pages=total_pages, fields=fields_response)
         
         # Save cache
         json_cache_path = os.path.join(CACHE_DIR, filename + ".fields.json")
@@ -396,7 +340,8 @@ async def form_filler_get_fields(
                 )
             )
 
-        resp = FormFillerUploadResponse(filename=safe_filename, fields=fields_response)
+        total_pages = get_pdf_page_count(file_path)
+        resp = FormFillerUploadResponse(filename=safe_filename, total_pages=total_pages, fields=fields_response)
         
         # Save cache
         try:

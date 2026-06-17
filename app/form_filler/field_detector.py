@@ -604,5 +604,11 @@ def detect_fields(pdf_path: str):
             })
             field_counter += 1
             
+    if not detected:
+        try:
+            detected = fallback_opencv_detect(doc)
+        except Exception as e:
+            print(f"OpenCV fallback detection failed: {e}")
+            
     doc.close()
     return detected

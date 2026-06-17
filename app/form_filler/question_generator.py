@@ -47,6 +47,15 @@ def generate_fallback_question(field_name: str, context: str) -> str:
     clean_ctx = re.sub(r"__+", "", clean_ctx)
     clean_ctx = clean_ctx.strip().rstrip(":").rstrip(" ").rstrip("-")
     
+    # Translate context to English if it contains non-English characters
+    try:
+        from deep_translator import GoogleTranslator
+        # Detect any non-ASCII characters (like Japanese or Nepali)
+        if clean_ctx and re.search(r'[^\x00-\x7F]', clean_ctx):
+            clean_ctx = GoogleTranslator(source='auto', target='en').translate(clean_ctx)
+    except Exception as e:
+        print(f"Translation failed: {e}")
+    
     # Check if context matches common patterns (longest keys first)
     ctx_lower = clean_ctx.lower()
     sorted_keys = sorted(COMMON_FIELD_MAPPINGS.keys(), key=len, reverse=True)

@@ -25493,7 +25493,7 @@ _.d=b
 _.e=c
 _.f=d
 _.a=e},
-a_K:function a_K(){this.a="http://localhost:8000"},
+a_K:function a_K(){this.a="https://form-filler-app-7dw7.onrender.com"},
 a_O:function a_O(){},
 a_N:function a_N(){},
 a_L:function a_L(){},
@@ -85385,7 +85385,7 @@ case 5:return A.M(null,r)
 case 1:return A.L(p.at(-1),r)}})
 return A.N($async$wR,r)},
 L(a){var s,r,q,p,o,n,m,l,k,j,i=this,h=null,g=A.j5(a,!0,t.Yr),f=g.gob(0),e=g.gXD(),d=g.a.a
-if(f.length===0||e<=0)return A.NT(A.Il(h,B.bi,h,h,B.VX),B.cw,B.mA)
+if(f.length===0||e<=0)return A.NT(A.Il(h,B.bi,h,h,B.VY),B.cw,B.mA)
 s=d+"/page-image?filename="+A.kt(2,f,B.B,!1)+"&page_index="+i.d+"&thumbnail=false"
 i.aba(s)
 r=J.avB(i.e,new A.amG(i))
@@ -85400,12 +85400,12 @@ l=A.ct(h,A.ck(""+(n+1)+" / "+e,h,h,h,B.zS,h,h),B.r,h,h,new A.cp(B.aW,h,h,l,h,h,B
 r=A.Il(A.b([m,l,A.eR(h,h,B.o4,h,h,n<e-1?new A.amN(i,e):h,h,h,"Next Page"),A.eR(h,h,B.o7,h,h,new A.amO(i),h,h,"Reset Zoom"),B.PW,new A.xK(new A.amP(i),h,h,t.bo),A.eR(h,h,B.Gr,h,h,i.gaft(),h,h,"My Profile"),B.bG],p),B.bi,0,r,o)
 o=A.ct(h,A.a7J(i.CW,new A.amQ(i,e,new A.amR(d,f)),e,B.jy),B.r,B.bi,h,h,h,h,h,h,h,h,140)
 n=A.fQ(A.ct(h,A.aAU(B.F6,A.hu(new A.bT(B.dq,i.ax==null||i.ay==null?B.mB:A.aMy(new A.amS(i,s,q)),h),h,h),4,0.5,i.cy),B.r,B.cw,h,h,h,h,h,h,h,h,h),1)
-m=A.dn(A.b([B.Gu,B.bG,B.VJ],p),B.C,B.x,B.P,0)
+m=A.dn(A.b([B.Gu,B.bG,B.VK],p),B.C,B.x,B.P,0)
 l=i.z
 l=A.b([A.dn(A.b([new A.qU("Black",B.l,l==="Black",!1,new A.amT(i),h),new A.qU("Blue",B.er,l==="Blue",!1,new A.amU(i),h),new A.qU("Red",B.fH,l==="Red",!1,new A.amJ(i),h),new A.qU("Custom",i.as,l==="Custom",!0,new A.amK(i),h)],p),B.C,B.kC,B.P,0)],p)
 if(i.z==="Custom")B.b.S(l,A.b([B.dX,A.dn(A.b([A.fQ(A.Pj(i.Q,A.zc(h,new A.dw(4,A.ca(6),B.ea),h,B.nr,h,h,h,h,!0,new A.dw(4,A.ca(6),B.j_),h,h,h,h,h,h,h,h,h,h,h,new A.dw(4,A.ca(6),B.B_),h,h,h,h,h,h,h,h,B.ij,"E94560",h,h,h,h,h,h,h,B.zL,"Custom Hex Color",!0,!0,h,h,h,h,B.lv,"# ",h,h,h,h,h,h,h,h),h,B.Tx),1),B.zf,A.ct(h,h,B.r,h,h,new A.cp(i.as,h,A.mo(B.cy,1),A.ca(6),h,h,B.a0),h,32,h,h,h,h,32)],p),B.C,B.x,B.P,0)],p))
 l=A.hv(l,B.cz,B.x,B.P)
-k=A.b([B.GD,B.bG,B.VT,B.zm],p)
+k=A.b([B.GD,B.bG,B.VU,B.zm],p)
 if(!i.f)k.push(A.ck(""+J.bY(i.e)+" detected",h,h,h,B.ik,h,h))
 k=A.dn(k,B.C,B.x,B.P,0)
 if(i.f)j=B.mB
@@ -85579,7 +85579,7 @@ A.amP.prototype={
 $3(a,b,c){var s
 if(b.y)s=B.Mv
 else{s=this.a
-s=A.aCU(B.GJ,B.VP,J.eZ(s.e)?null:s.gaeu())}return s},
+s=A.aCU(B.GJ,B.VQ,J.eZ(s.e)?null:s.gaeu())}return s},
 $S:533}
 A.amQ.prototype={
 $2(a,b){var s=null,r=this.a,q=b===r.d,p=A.ca(6),o=A.mo(q?B.y:B.J,2),n=q?B.y:B.aW
@@ -85715,7 +85715,7 @@ A.amL.prototype={
 $2(a,b){var s,r=null,q=this.a,p=q.db[b],o=J.d(p.h(0,"isBot"),!0),n=J.d(p.h(0,"isFinished"),!0),m=o?B.fv:B.m5,l=o?B.aW:B.y,k=o?0:16,j=o?16:0,i=A.b([new A.dc(0,B.bL,A.aI(51,B.l.D()>>>16&255,B.l.D()>>>8&255,B.l.D()&255),B.uF,4)],t.sq),h=t.p,g=A.b([A.ck(p.h(0,"text"),r,r,r,B.zU,r,r)],h)
 if(n){s=q.fx
 q=s?r:q.ga6B()
-s=s?B.VL:B.VI
+s=s?B.VM:B.VJ
 B.b.S(g,A.b([B.dX,A.aAo(B.Gk,s,q,A.a3I(r,r,B.j,r,r,r,r,r,r,B.aW,r,r,r,r,r,r,r,r,r,r))],h))}return new A.dR(m,r,r,A.ct(r,A.hv(g,B.by,B.x,B.P),B.r,r,B.B9,new A.cp(l,r,r,new A.cD(B.hM,B.hM,new A.aA(k,k),new A.aA(j,j)),i,r,B.a0),r,r,B.F0,B.ns,r,r,r),r)},
 $S:541}
 A.amM.prototype={
@@ -85860,7 +85860,7 @@ s.cL()
 this.f.sq(0,s)
 this.a6(new A.apa(this,a))},
 L(a){var s,r,q,p,o,n,m,l=this,k=null,j=A.j5(a,!0,t.Yr),i=j.gob(0),h=j.gXD(),g=j.a.a
-if(i.length===0||h<=0)return A.NT(A.Il(k,B.bi,k,k,B.VV),B.cw,B.mA)
+if(i.length===0||h<=0)return A.NT(A.Il(k,B.bi,k,k,B.VW),B.cw,B.mA)
 s=g+"/page-image?filename="+A.kt(2,i,B.B,!1)+"&page_index="+l.d+"&thumbnail=false"
 r=A.eR(k,k,B.o8,k,k,new A.apf(a,j),k,k,k)
 q=t.p
@@ -85936,7 +85936,7 @@ xB(){var s=0,r=A.O(t.H),q=1,p=[],o=this,n,m,l,k,j
 var $async$xB=A.I(function(a,b){if(a===1){p.push(b)
 s=q}for(;;)switch(s){case 0:q=3
 s=6
-return A.P($.aAv.b9().AM(A.b(["pdf"],t.s),B.nT,!0),$async$xB)
+return A.P($.aAv.b9().AM(A.b(["pdf","png","jpg","jpeg"],t.s),B.nT,!0),$async$xB)
 case 6:n=b
 if(n!=null&&J.kC(n.a))o.a6(new A.asR(o,n))
 q=1
@@ -85994,7 +85994,7 @@ s.jO(A.C_(p,p,p,B.y,p,B.I,p,A.ck(r,p,p,p,p,p,p),p,B.ER,p,p,p,p,p,p,p,p,p,p))}els
 s.toString
 r=A.aBo(new A.asQ(q),p,t.z)
 A.ig(s,!1).oF(r)}},
-L(a){var s,r,q,p,o,n,m,l=this,k=null,j=A.j5(a,!0,t.Yr),i=j.e,h=t.p,g=A.Il(A.b([A.eR(k,k,B.Go,k,k,l.gafv(),k,k,"Configure Backend URL")],h),B.bi,0,k,B.O1),f=A.b([B.GA,B.bG,B.VW,B.zm],h)
+L(a){var s,r,q,p,o,n,m,l=this,k=null,j=A.j5(a,!0,t.Yr),i=j.e,h=t.p,g=A.Il(A.b([A.eR(k,k,B.Go,k,k,l.gafv(),k,k,"Configure Backend URL")],h),B.bi,0,k,B.O1),f=A.b([B.GA,B.bG,B.VX,B.zm],h)
 if(j.b)f.push(B.PX)
 else f.push(A.eR(k,B.md,B.GB,k,k,new A.asZ(j),B.bj,k,"Refresh history"))
 f=A.dn(f,B.C,B.x,B.P,0)
@@ -86008,17 +86008,17 @@ p=A.mo(B.cO,1)
 o=A.b([],h)
 n=l.d
 if(n!=null)B.b.S(o,A.b([A.dn(A.b([B.Gt,B.ie,A.fQ(A.ck(n,k,B.as,k,B.Uv,k,k),1),A.eR(k,B.md,B.Gw,k,k,new A.at2(l),B.bj,k,k)],h),B.C,B.x,B.P,0),B.zh],h))
-else B.b.S(o,A.b([B.VF,B.Q0],h))
+else B.b.S(o,A.b([B.VG,B.Q0],h))
 n=j.b?k:l.gady()
 m=A.aNo(k,k,k,k,k,k,k,k,k,B.F,k,k,B.nu,k,new A.cH(A.ca(8),B.q),B.j_,k,k,k,k)
-o.push(new A.Mt(!0,n,k,k,k,m,k,k,!1,k,!0,k,new A.Ul(B.VU,B.GG,m,k,k),k))
-s=A.b([s,B.ln,B.W2,B.zi,B.VQ,B.ln,r,B.ln,A.ct(k,A.hv(o,B.C,B.x,B.P),B.r,k,k,new A.cp(B.bi,k,p,q,k,k,B.a0),k,k,k,B.nv,k,k,k),B.Q1],h)
+o.push(new A.Mt(!0,n,k,k,k,m,k,k,!1,k,!0,k,new A.Ul(B.VV,B.GG,m,k,k),k))
+s=A.b([s,B.ln,B.W2,B.zi,B.VR,B.ln,r,B.ln,A.ct(k,A.hv(o,B.C,B.x,B.P),B.r,k,k,new A.cp(B.bi,k,p,q,k,k,B.a0),k,k,k,B.nv,k,k,k),B.Q1],h)
 if(j.b)s.push(B.E_)
 else{r=l.e==null
 q=r?k:new A.at3(l,j)
 p=A.ca(12)
 r=!r?4:0
-s.push(A.h8(A.aAm(!1,B.VN,k,k,k,k,k,k,q,k,A.a3I(k,k,B.y,B.cO,k,k,r,k,k,B.j,k,k,B.F3,k,new A.cH(p,B.q),k,k,k,k,k)),k,1/0))}s.push(B.zh)
+s.push(A.h8(A.aAm(!1,B.VO,k,k,k,k,k,k,q,k,A.a3I(k,k,B.y,B.cO,k,k,r,k,k,B.j,k,k,B.F3,k,new A.cH(p,B.q),k,k,k,k,k)),k,1/0))}s.push(B.zh)
 s.push(A.ck("Backend: "+j.a.a,k,k,k,B.UP,k,k))
 return A.NT(g,B.cw,A.dn(A.b([f,A.fQ(A.hu(A.aOW(new A.f2(B.Bb,A.hv(s,B.C,B.hA,B.P),k),B.nx),k,k),1)],h),B.C,B.x,B.P,0))}}
 A.at4.prototype={
@@ -86035,7 +86035,7 @@ s.d=r.b},
 $S:0}
 A.asU.prototype={
 $1(a){var s=null,r=A.ca(16),q=this.a,p=t.p
-return new A.rB(B.VO,A.hv(A.b([A.Pj(q.f,A.zc(s,new A.dw(4,A.ca(8),B.ea),s,s,s,s,s,s,!0,new A.dw(4,A.ca(8),B.j_),s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,B.ij,"http://localhost:8000",s,s,s,s,s,s,s,B.lv,"FastAPI Backend URL",!0,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s),s,B.il),B.dX,B.VS],p),B.by,B.x,B.aY),A.b([A.ahv(!1,B.zV,s,s,s,s,s,s,new A.asS(a),s,s),A.aAm(!1,B.VD,s,s,s,s,s,s,new A.asT(q,a),s,A.a3I(s,s,B.y,s,s,s,s,s,s,B.j,s,s,s,s,new A.cH(A.ca(8),B.q),s,s,s,s,s))],p),B.bi,new A.cH(r,B.q),s)},
+return new A.rB(B.VP,A.hv(A.b([A.Pj(q.f,A.zc(s,new A.dw(4,A.ca(8),B.ea),s,s,s,s,s,s,!0,new A.dw(4,A.ca(8),B.j_),s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,s,B.ij,"http://localhost:8000",s,s,s,s,s,s,s,B.lv,"FastAPI Backend URL",!0,!0,s,s,s,s,s,s,s,s,s,s,s,s,s,s),s,B.il),B.dX,B.VT],p),B.by,B.x,B.aY),A.b([A.ahv(!1,B.zV,s,s,s,s,s,s,new A.asS(a),s,s),A.aAm(!1,B.VE,s,s,s,s,s,s,new A.asT(q,a),s,A.a3I(s,s,B.y,s,s,s,s,s,s,B.j,s,s,s,s,new A.cH(A.ca(8),B.q),s,s,s,s,s))],p),B.bi,new A.cH(r,B.q),s)},
 $S:549}
 A.asS.prototype={
 $0(){A.ig(this.a,!1).vk(null)
@@ -92004,8 +92004,8 @@ B.CB=new A.xl(null,null,null,null,null,null,null)
 B.CC=new A.xm(null,null,null,null,null,null)
 B.F=new A.D(0.7019607843137254,1,1,1,B.e)
 B.zK=new A.m(!0,B.F,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VG=new A.bV("No PDF file loaded.",null,B.zK,null,null,null,null,null,null)
-B.mA=new A.fJ(B.U,null,null,B.VG,null)
+B.VH=new A.bV("No PDF file loaded.",null,B.zK,null,null,null,null,null,null)
+B.mA=new A.fJ(B.U,null,null,B.VH,null)
 B.x=new A.n5(0,"start")
 B.aY=new A.LS(0,"min")
 B.C=new A.oN(2,"center")
@@ -92017,20 +92017,20 @@ B.GC=new A.cc(B.FX,48,B.jf,null,null)
 B.dX=new A.d7(null,12,null,null)
 B.zO=new A.m(!0,B.cy,null,null,null,null,13,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.cg=new A.lL(2,"center")
-B.VH=new A.bV("No PDFs yet.\nUpload one to get started.",null,B.zO,B.cg,null,null,null,null,null)
-B.Jm=s([B.GC,B.dX,B.VH],t.p)
+B.VI=new A.bV("No PDFs yet.\nUpload one to get started.",null,B.zO,B.cg,null,null,null,null,null)
+B.Jm=s([B.GC,B.dX,B.VI],t.p)
 B.DX=new A.mw(B.a8,B.x,B.aY,B.C,null,B.b0,null,0,B.Jm,null)
 B.CD=new A.fJ(B.U,null,null,B.DX,null)
 B.Zq=new A.aj0(0,"material")
 B.mD=new A.mr(null,null,null,B.y,null,null,null,null)
 B.mB=new A.fJ(B.U,null,null,B.mD,null)
 B.ij=new A.m(!0,B.cy,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VK=new A.bV("No fillable fields detected.",null,B.ij,null,null,null,null,null,null)
-B.CE=new A.fJ(B.U,null,null,B.VK,null)
+B.VL=new A.bV("No fillable fields detected.",null,B.ij,null,null,null,null,null,null)
+B.CE=new A.fJ(B.U,null,null,B.VL,null)
 B.FV=new A.bR(57912,"MaterialIcons",!1)
 B.Gv=new A.cc(B.FV,48,B.y,null,null)
-B.VC=new A.bV("Failed to render page",null,B.zK,null,null,null,null,null,null)
-B.Io=s([B.Gv,B.dX,B.VC],t.p)
+B.VD=new A.bV("Failed to render page",null,B.zK,null,null,null,null,null,null)
+B.Io=s([B.Gv,B.dX,B.VD],t.p)
 B.DY=new A.mw(B.a8,B.x,B.aY,B.C,null,B.b0,null,0,B.Io,null)
 B.CF=new A.fJ(B.U,null,null,B.DY,null)
 B.CG=new A.xq(null,null,null,null,null,null,null,null,null)
@@ -92411,8 +92411,8 @@ B.aG=new A.i3(6)
 B.UV=new A.m(!0,B.j,null,null,null,null,16,B.aG,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.W3=new A.bV("My Profile",null,B.UV,null,null,null,null,null,null)
 B.ik=new A.m(!0,B.cP,null,null,null,null,11,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VZ=new A.bV("Stored data used for smart Auto-Fill",null,B.ik,null,null,null,null,null,null)
-B.Jo=s([B.W3,B.VZ],t.p)
+B.W_=new A.bV("Stored data used for smart Auto-Fill",null,B.ik,null,null,null,null,null,null)
+B.Jo=s([B.W3,B.W_],t.p)
 B.DZ=new A.mw(B.a8,B.x,B.P,B.by,null,B.b0,null,0,B.Jo,null)
 B.Fz=new A.oX(1,B.eI,B.DZ,null)
 B.FA=new A.yy(null,null,null,null,null,null,null,null,null,null,null,null,null)
@@ -93862,15 +93862,15 @@ B.Gg=new A.bR(984397,"MaterialIcons",!1)
 B.GK=new A.cc(B.Gg,14,B.c2,null,null)
 B.zg=new A.d7(6,null,null,null)
 B.zL=new A.m(!0,B.c2,null,null,null,null,11,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.W_=new A.bV("Pinch or scroll to zoom",null,B.zL,null,null,null,null,null,null)
-B.IQ=s([B.GK,B.zg,B.W_],t.p)
+B.W0=new A.bV("Pinch or scroll to zoom",null,B.zL,null,null,null,null,null,null)
+B.IQ=s([B.GK,B.zg,B.W0],t.p)
 B.O0=new A.lz(B.at,B.x,B.aY,B.C,null,B.b0,null,0,B.IQ,null)
 B.FT=new A.bR(57535,"MaterialIcons",!1)
 B.Gx=new A.cc(B.FT,22,B.y,null,null)
 B.ie=new A.d7(10,null,null,null)
 B.RZ=new A.m(!0,B.j,null,null,null,null,null,B.aG,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VY=new A.bV("PDF Viewer",null,B.RZ,null,null,null,null,null,null)
-B.Jt=s([B.Gx,B.ie,B.VY],t.p)
+B.VZ=new A.bV("PDF Viewer",null,B.RZ,null,null,null,null,null,null)
+B.Jt=s([B.Gx,B.ie,B.VZ],t.p)
 B.O1=new A.lz(B.at,B.x,B.P,B.C,null,B.b0,null,0,B.Jt,null)
 B.O2=new A.Bl(1333)
 B.kX=new A.Bl(2222)
@@ -94103,16 +94103,16 @@ B.Qa=new A.k7(3,"hide")
 B.Zp=new A.k7(4,"remove")
 B.Qb=new A.k7(5,"timeout")
 B.Qc=new A.uD(null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.W0=new A.bV("Please pick a valid PDF file first.",null,null,null,null,null,null,null,null)
-B.Qd=new A.jh(B.W0,null,null,null,null,null,null,null,null,null,null,null,null,B.dp,!1,null,null,null,B.I,null)
-B.VR=new A.bV("Filled PDF generated and downloaded successfully.",null,null,null,null,null,null,null,null)
-B.Qe=new A.jh(B.VR,B.fS,null,null,null,null,null,null,null,null,null,null,null,B.dp,!1,null,null,null,B.I,null)
-B.VE=new A.bV("No profile data found. Please add your profile info first.",null,null,null,null,null,null,null,null)
-B.Qf=new A.jh(B.VE,B.aW,null,null,null,null,null,null,null,null,null,null,null,B.nk,!1,null,null,null,B.I,null)
+B.VC=new A.bV("Please pick a valid PDF or Image file first.",null,null,null,null,null,null,null,null)
+B.Qd=new A.jh(B.VC,null,null,null,null,null,null,null,null,null,null,null,null,B.dp,!1,null,null,null,B.I,null)
+B.VS=new A.bV("Filled PDF generated and downloaded successfully.",null,null,null,null,null,null,null,null)
+B.Qe=new A.jh(B.VS,B.fS,null,null,null,null,null,null,null,null,null,null,null,B.dp,!1,null,null,null,B.I,null)
+B.VF=new A.bV("No profile data found. Please add your profile info first.",null,null,null,null,null,null,null,null)
+B.Qf=new A.jh(B.VF,B.aW,null,null,null,null,null,null,null,null,null,null,null,B.nk,!1,null,null,null,B.I,null)
 B.W5=new A.bV("Failed to save profile. Check backend connection.",null,null,null,null,null,null,null,null)
 B.Qg=new A.jh(B.W5,B.y,null,null,null,null,null,null,null,null,null,null,null,B.dp,!1,null,null,null,B.I,null)
-B.VM=new A.bV("Profile saved successfully.",null,null,null,null,null,null,null,null)
-B.Qh=new A.jh(B.VM,B.fS,null,null,null,null,null,null,null,null,null,null,null,B.h6,!1,null,null,null,B.I,null)
+B.VN=new A.bV("Profile saved successfully.",null,null,null,null,null,null,null,null)
+B.Qh=new A.jh(B.VN,B.fS,null,null,null,null,null,null,null,null,null,null,null,B.h6,!1,null,null,null,B.I,null)
 B.zl=new A.C1(0,"permissive")
 B.Qi=new A.C1(1,"normal")
 B.Qj=new A.C1(2,"forced")
@@ -94526,26 +94526,26 @@ B.Rt=new A.m(!0,B.l,null,".AppleSystemUIFont",null,null,null,null,null,null,null
 B.Vz=new A.dL(B.Tg,B.Se,B.Th,B.TS,B.RP,B.RX,B.SB,B.TE,B.SQ,B.Uo,B.Ri,B.RE,B.Uj,B.UD,B.Rt)
 B.SX=new A.m(!0,B.cx,null,null,null,null,12,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.VB=new A.bV("Add field",null,B.SX,null,null,null,null,null,null)
-B.VD=new A.bV("Save",null,null,null,null,null,null,null,null)
-B.VF=new A.bV("No file selected",null,B.zO,null,null,null,null,null,null)
-B.VI=new A.bV("Generate PDF",null,B.im,null,null,null,null,null,null)
+B.VE=new A.bV("Save",null,null,null,null,null,null,null,null)
+B.VG=new A.bV("No file selected",null,B.zO,null,null,null,null,null,null)
+B.VJ=new A.bV("Generate PDF",null,B.im,null,null,null,null,null,null)
 B.lw=new A.m(!0,B.j,null,null,null,null,14,B.aG,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VJ=new A.bV("Text Pen Color",null,B.lw,null,null,null,null,null,null)
-B.VL=new A.bV("Generating...",null,null,null,null,null,null,null,null)
+B.VK=new A.bV("Text Pen Color",null,B.lw,null,null,null,null,null,null)
+B.VM=new A.bV("Generating...",null,null,null,null,null,null,null,null)
 B.V8=new A.m(!0,null,null,null,null,null,16,B.aG,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VN=new A.bV("Upload & Open",null,B.V8,null,null,null,null,null,null)
-B.VO=new A.bV("API Settings",null,B.il,null,null,null,null,null,null)
+B.VO=new A.bV("Upload & Open",null,B.V8,null,null,null,null,null,null)
+B.VP=new A.bV("API Settings",null,B.il,null,null,null,null,null,null)
 B.S9=new A.m(!0,B.cx,null,null,null,null,12,B.aG,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VP=new A.bV("Auto-Fill",null,B.S9,null,null,null,null,null,null)
+B.VQ=new A.bV("Auto-Fill",null,B.S9,null,null,null,null,null,null)
 B.Sa=new A.m(!0,B.cP,null,null,null,null,14,null,null,null,null,null,1.6,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VQ=new A.bV("Upload a PDF to view each page as a\npixel-perfect replica with zoom & pan.",null,B.Sa,B.cg,null,null,null,null,null)
+B.VR=new A.bV("Upload a PDF to view each page as a\npixel-perfect replica with zoom & pan.",null,B.Sa,B.cg,null,null,null,null,null)
 B.RW=new A.m(!0,B.cP,null,null,null,null,12,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.VS=new A.bV("\ud83d\udca1 Android Emulator: use http://10.0.2.2:8000",null,B.RW,null,null,null,null,null,null)
-B.VT=new A.bV("Form Fields Wizard",null,B.lw,null,null,null,null,null,null)
-B.VU=new A.bV("Browse Files",null,null,null,null,null,null,null,null)
-B.VV=new A.bV("PDF Page Viewer",null,B.il,null,null,null,null,null,null)
-B.VW=new A.bV("Recent PDFs",null,B.lw,null,null,null,null,null,null)
-B.VX=new A.bV("PDF Form Filler",null,B.il,null,null,null,null,null,null)
+B.VT=new A.bV("\ud83d\udca1 Android Emulator: use http://10.0.2.2:8000",null,B.RW,null,null,null,null,null,null)
+B.VU=new A.bV("Form Fields Wizard",null,B.lw,null,null,null,null,null,null)
+B.VV=new A.bV("Browse Files",null,null,null,null,null,null,null,null)
+B.VW=new A.bV("PDF Page Viewer",null,B.il,null,null,null,null,null,null)
+B.VX=new A.bV("Recent PDFs",null,B.lw,null,null,null,null,null,null)
+B.VY=new A.bV("PDF Form Filler",null,B.il,null,null,null,null,null,null)
 B.Sf=new A.m(!0,B.j,null,null,null,null,28,B.aG,null,-0.5,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.W2=new A.bV("Open a PDF",null,B.Sf,null,null,null,null,null,null)
 B.zV=new A.bV("Cancel",null,B.lv,null,null,null,null,null,null)

@@ -48,6 +48,40 @@ COMMON_FIELD_MAPPINGS = {
 COMMON_FIELD_MAPPINGS["date of birth"] = "What is your date of birth?"
 COMMON_FIELD_MAPPINGS["birth"] = "What is your date of birth?"
 
+def is_generic_label(text: str) -> bool:
+    if not text:
+        return True
+    text_lower = text.strip().lower()
+    # Remove punctuation
+    text_lower = re.sub(r"[\s_:\-\.>=<]+", " ", text_lower).strip()
+    if not text_lower:
+        return True
+        
+    generic_words = {
+        "blank line", "box", "table grid", "visual", "field", "text", 
+        "textfield", "formfield", "textbox", "input", "value", "button",
+        "select", "checkbox", "radio"
+    }
+    if text_lower in generic_words:
+        return True
+        
+    # Check patterns like cv_field_123, text123, field123, textbox123, formfield123
+    patterns = [
+        r"^cv_field_\d+$",
+        r"^text\d+$",
+        r"^textfield\d+$",
+        r"^field\d+$",
+        r"^formfield\d+$",
+        r"^textbox\d+$",
+        r"^box\d+$",
+        r"^input\d+$"
+    ]
+    for p in patterns:
+        if re.match(p, text_lower):
+            return True
+            
+    return False
+
 def generate_fallback_question(field_name: str, context: str, doc_path: str = "") -> str:
     """Generates a friendly question using rule-based parsing as a fallback."""
     # Prioritize context label if it contains useful words
@@ -56,11 +90,35 @@ def generate_fallback_question(field_name: str, context: str, doc_path: str = ""
     clean_ctx = re.sub(r"__+", "", clean_ctx)
     clean_ctx = clean_ctx.strip().rstrip(":").rstrip(" ").rstrip("-")
     
-    if clean_ctx:
+    if clean_ctx and not is_generic_label(clean_ctx):
+        ctx_lower = clean_ctx.lower()
+        sorted_keys = sorted(COMMON_FIELD_MAPPINGS.keys(), key=len, reverse=True)
+        for key in sorted_keys:
+            val = COMMON_FIELD_MAPPINGS[key]
+            if key in ctx_lower or re.search(r"\b" + re.escape(key) + r"\b", ctx_lower):
+                return val
+        
+        # If we have a good context, build "What is your [context]?" or "[context]?"
+        # Avoid double 'what' or 'please'
+        if clean_ctx.lower().startswith("what") or clean_ctx.lower().startswith("please") or clean_ctx.lower().startswith("enter"):
+            return clean_ctx if clean_ctx.endswith("?") or clean_ctx.endswith(".") else clean_ctx + "?"
+        
+        # Keep original format: clean_ctx?
         return f"{clean_ctx}?"
         
     # If no context but we have a name
-    if field_name:
+    if field_name and not is_generic_label(field_name):
+        name_lower = field_name.lower()
+        name_lower = re.sub(r"_\d+$", "", name_lower)
+        name_lower = re.sub(r"\d+$", "", name_lower)
+        
+        sorted_keys = sorted(COMMON_FIELD_MAPPINGS.keys(), key=len, reverse=True)
+        for key in sorted_keys:
+            val = COMMON_FIELD_MAPPINGS[key]
+            key_parts = key.replace("_", " ").replace("-", " ").split()
+            if key == name_lower or any(part in name_lower.split("_") or part in name_lower.split(" ") for part in key_parts):
+                return val
+                
         # Convert snake_case or camelCase to spaces
         spaced_name = re.sub(r"([a-z])([A-Z])", r"\1 \2", field_name)
         spaced_name = spaced_name.replace("_", " ").replace("-", " ")

@@ -141,15 +141,21 @@ def fill_pdf(input_pdf_path: str, output_pdf_path: str, answers: list, pen_color
                 x0, y0, x1, y1 = rect
                 
                 box_height = y1 - y0
-                font_size = box_height * 0.65
-                if font_size > 14: font_size = 14
-                if font_size < 8: font_size = 8
+                is_line = box_height < 10.0
+                
+                if is_line:
+                    font_size = 10.0
+                else:
+                    font_size = box_height * 0.65
+                    if font_size > 14: font_size = 14
+                    if font_size < 8: font_size = 8
                 
                 can.saveState()
-                path = can.beginPath()
-                # rect in reportlab is (x, y, width, height) from bottom-left
-                path.rect(x0, height - y1, x1 - x0, y1 - y0)
-                can.clipPath(path, stroke=0, fill=0)
+                if not is_line:
+                    path = can.beginPath()
+                    # rect in reportlab is (x, y, width, height) from bottom-left
+                    path.rect(x0, height - y1, x1 - x0, y1 - y0)
+                    can.clipPath(path, stroke=0, fill=0)
 
                 # Center horizontally
                 x_rl = x0 + 2

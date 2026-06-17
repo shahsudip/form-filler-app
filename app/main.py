@@ -180,7 +180,7 @@ async def get_page_image(
 
 
 @app.get("/page-text", tags=["PDF"])
-async def get_page_text(
+def get_page_text(
     filename: str = Query(..., description="Name of the PDF file in cache"),
     page_index: int = Query(..., description="0-based index of the page to extract text from"),
     use_ocr: bool = Query(True, description="Whether to use OCR for text extraction")
@@ -228,25 +228,27 @@ async def get_page_text(
                     except Exception:
                         # Fallback to winocr for local Windows debugging
                         import winocr
-                        if w > h:
-                            clip_left = fitz.Rect(0, 0, w / 2, h)
-                            pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
-                            img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
-                            res_left = await winocr.recognize_pil(img_left, 'ja')
-                            text_left = res_left.get("text", "")
+                        import concurrent.futures
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                            if w > h:
+                                clip_left = fitz.Rect(0, 0, w / 2, h)
+                                pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
+                                img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
+                                res_left = executor.submit(winocr.recognize_pil_sync, img_left, 'ja').result()
+                                text_left = res_left.get("text", "")
 
-                            clip_right = fitz.Rect(w / 2, 0, w, h)
-                            pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
-                            img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
-                            res_right = await winocr.recognize_pil(img_right, 'ja')
-                            text_right = res_right.get("text", "")
+                                clip_right = fitz.Rect(w / 2, 0, w, h)
+                                pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
+                                img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
+                                res_right = executor.submit(winocr.recognize_pil_sync, img_right, 'ja').result()
+                                text_right = res_right.get("text", "")
 
-                            text = f"{text_left.strip()}\n\n{text_right.strip()}"
-                        else:
-                            pix = page.get_pixmap(matrix=mat)
-                            img = Image.open(io.BytesIO(pix.tobytes("png")))
-                            res = await winocr.recognize_pil(img, 'ja')
-                            text = res.get("text", "").strip()
+                                text = f"{text_left.strip()}\n\n{text_right.strip()}"
+                            else:
+                                pix = page.get_pixmap(matrix=mat)
+                                img = Image.open(io.BytesIO(pix.tobytes("png")))
+                                res = executor.submit(winocr.recognize_pil_sync, img, 'ja').result()
+                                text = res.get("text", "").strip()
 
                     return {"text": text}
             except Exception as ocr_err:
@@ -271,7 +273,7 @@ class TranslateRequest(BaseModel):
     text: str
 
 @app.post("/form-filler/translate-nepali", tags=["Form Filler"])
-async def translate_nepali(req: TranslateRequest):
+def translate_nepali(req: TranslateRequest):
     try:
         from deep_translator import GoogleTranslator
         translator = GoogleTranslator(source='auto', target='ne')
@@ -281,7 +283,7 @@ async def translate_nepali(req: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/form-filler/upload", response_model=FormFillerUploadResponse, tags=["Form Filler"])
-async def form_filler_upload(file: UploadFile = File(...)):
+def form_filler_upload(file: UploadFile = File(...)):
     """
     Uploads a PDF, runs field detection (digital, visual, character-grid),
     generates direct user-friendly questions, and caches the PDF file.
@@ -343,7 +345,7 @@ async def form_filler_upload(file: UploadFile = File(...)):
 
 
 @app.get("/form-filler/fields", response_model=FormFillerUploadResponse, tags=["Form Filler"])
-async def form_filler_get_fields(
+def form_filler_get_fields(
     filename: str = Query(..., description="Name of the cached PDF file to detect fields from")
 ):
     """
@@ -404,7 +406,7 @@ async def form_filler_get_fields(
 
 
 @app.post("/form-filler/fill", tags=["Form Filler"])
-async def form_filler_fill(request: FormFillerFillRequest):
+def form_filler_fill(request: FormFillerFillRequest):
     """
     Fills visual blanks, character-grid cells, and digital AcroForm fields in the specified PDF.
     Applies custom pen color and returns the resulting PDF file.

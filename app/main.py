@@ -319,7 +319,7 @@ async def form_filler_upload(file: UploadFile = File(...)):
             if "signature" in ctx_lower or "sign" in ctx_lower or "हस्ताक्षर" in ctx_lower or "signature" in name_lower or "sign" in name_lower:
                 continue
                 
-            q = generate_question(f.get("field_name"), f.get("context"))
+            q = generate_question(f.get("field_name"), f.get("context"), doc_path=dest_path)
             fields_response.append(
                 FormField(
                     id=f["id"],
@@ -383,7 +383,7 @@ async def form_filler_get_fields(
 
         fields_response = []
         for f in detected_fields:
-            q = generate_question(f.get("field_name"), f.get("context"))
+            q = generate_question(f.get("field_name"), f.get("context"), doc_path=file_path)
             fields_response.append(
                 FormField(
                     id=f["id"],

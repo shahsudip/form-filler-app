@@ -48,7 +48,7 @@ COMMON_FIELD_MAPPINGS = {
 COMMON_FIELD_MAPPINGS["date of birth"] = "What is your date of birth?"
 COMMON_FIELD_MAPPINGS["birth"] = "What is your date of birth?"
 
-def generate_fallback_question(field_name: str, context: str) -> str:
+def generate_fallback_question(field_name: str, context: str, doc_path: str = "") -> str:
     """Generates a friendly question using rule-based parsing as a fallback."""
     # Prioritize context label if it contains useful words
     clean_ctx = context.strip() if context else ""
@@ -56,6 +56,19 @@ def generate_fallback_question(field_name: str, context: str) -> str:
     clean_ctx = re.sub(r"__+", "", clean_ctx)
     clean_ctx = clean_ctx.strip().rstrip(":").rstrip(" ").rstrip("-")
     
+    # Check if the document is a Japanese form
+    is_japanese_form = False
+    doc_path_lower = doc_path.lower() if doc_path else ""
+    if any(k in doc_path_lower for k in ['nihongo', 'jpn', 'japanese', 'n3', 'moji', 'goi']) or re.search(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]', doc_path_lower):
+        is_japanese_form = True
+
+    if is_japanese_form:
+        if clean_ctx:
+            return f"{clean_ctx}?"
+        if field_name:
+            return f"{field_name}?"
+        return "Please fill in this field."
+        
     # Translate context to English if it contains non-English characters
     try:
         from deep_translator import GoogleTranslator
@@ -124,9 +137,9 @@ def generate_fallback_question(field_name: str, context: str) -> str:
         
     return "Please fill in this field."
 
-def generate_question(field_name: str, context: str, model_name: str = "llama3", ollama_url: str = "http://localhost:11434") -> str:
+def generate_question(field_name: str, context: str, model_name: str = "llama3", ollama_url: str = "http://localhost:11434", doc_path: str = "") -> str:
     """
     Generates a natural user-friendly question from field name and context.
     Uses rule-based generation to minimize AI usage and ensure instantaneous response.
     """
-    return generate_fallback_question(field_name, context)
+    return generate_fallback_question(field_name, context, doc_path)

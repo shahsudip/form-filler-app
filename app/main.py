@@ -1,4 +1,6 @@
 import os
+os.environ["OMP_THREAD_LIMIT"] = "1"
+os.environ["MALLOC_ARENA_MAX"] = "2"
 import io
 import asyncio
 import json
@@ -194,7 +196,6 @@ async def get_page_text(
         if use_ocr:
             try:
                 import fitz
-                import pytesseract
                 from PIL import Image
 
                 with fitz.open(file_path) as doc:
@@ -206,22 +207,46 @@ async def get_page_text(
                     zoom = 2.0
                     mat = fitz.Matrix(zoom, zoom)
 
-                    if w > h:
-                        clip_left = fitz.Rect(0, 0, w / 2, h)
-                        pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
-                        img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
-                        text_left = pytesseract.image_to_string(img_left, lang='nep+jpn+eng')
+                    try:
+                        import pytesseract
+                        if w > h:
+                            clip_left = fitz.Rect(0, 0, w / 2, h)
+                            pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
+                            img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
+                            text_left = pytesseract.image_to_string(img_left, lang='nep+jpn+eng')
 
-                        clip_right = fitz.Rect(w / 2, 0, w, h)
-                        pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
-                        img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
-                        text_right = pytesseract.image_to_string(img_right, lang='nep+jpn+eng')
+                            clip_right = fitz.Rect(w / 2, 0, w, h)
+                            pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
+                            img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
+                            text_right = pytesseract.image_to_string(img_right, lang='nep+jpn+eng')
 
-                        text = f"{text_left.strip()}\n\n{text_right.strip()}"
-                    else:
-                        pix = page.get_pixmap(matrix=mat)
-                        img = Image.open(io.BytesIO(pix.tobytes("png")))
-                        text = pytesseract.image_to_string(img, lang='nep+jpn+eng').strip()
+                            text = f"{text_left.strip()}\n\n{text_right.strip()}"
+                        else:
+                            pix = page.get_pixmap(matrix=mat)
+                            img = Image.open(io.BytesIO(pix.tobytes("png")))
+                            text = pytesseract.image_to_string(img, lang='nep+jpn+eng').strip()
+                    except Exception:
+                        # Fallback to winocr for local Windows debugging
+                        import winocr
+                        if w > h:
+                            clip_left = fitz.Rect(0, 0, w / 2, h)
+                            pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
+                            img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
+                            res_left = await winocr.recognize_pil(img_left, 'ja')
+                            text_left = res_left.get("text", "")
+
+                            clip_right = fitz.Rect(w / 2, 0, w, h)
+                            pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
+                            img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
+                            res_right = await winocr.recognize_pil(img_right, 'ja')
+                            text_right = res_right.get("text", "")
+
+                            text = f"{text_left.strip()}\n\n{text_right.strip()}"
+                        else:
+                            pix = page.get_pixmap(matrix=mat)
+                            img = Image.open(io.BytesIO(pix.tobytes("png")))
+                            res = await winocr.recognize_pil(img, 'ja')
+                            text = res.get("text", "").strip()
 
                     return {"text": text}
             except Exception as ocr_err:

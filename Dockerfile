@@ -2,11 +2,9 @@
 FROM python:3.11-slim
 
 # Install system dependencies, including Tesseract OCR and Japanese language pack
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-jpn \
-    tesseract-ocr-eng \
-    libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory to /app

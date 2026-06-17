@@ -203,22 +203,44 @@ def get_closest_phrase(word_list, target_rect, direction='left'):
     
     # Expand upwards
     curr_top = min(w["top"] for w in valid_lines[best_idx])
+    best_x0 = min(w["x0"] for w in valid_lines[best_idx])
+    best_x1 = max(w["x1"] for w in valid_lines[best_idx])
     for i in range(best_idx - 1, -1, -1):
         prev_bottom = max(w["bottom"] for w in valid_lines[i])
-        if curr_top - prev_bottom < 15: # Within 15 points vertically
+        line_x0 = min(w["x0"] for w in valid_lines[i])
+        line_x1 = max(w["x1"] for w in valid_lines[i])
+        
+        # Check if there is some horizontal overlap or proximity
+        has_overlap = max(0, min(best_x1, line_x1) - max(best_x0, line_x0)) > 0
+        horiz_dist = min(abs(line_x0 - best_x0), abs(line_x1 - best_x1))
+        
+        if curr_top - prev_bottom < 15 and (has_overlap or horiz_dist < 50):
             merged_lines.insert(0, valid_lines[i])
             curr_top = min(w["top"] for w in valid_lines[i])
+            best_x0 = min(best_x0, line_x0)
+            best_x1 = max(best_x1, line_x1)
         else:
             break
             
     # Expand downwards (if left/right)
     if direction != 'above':
         curr_bottom = max(w["bottom"] for w in valid_lines[best_idx])
+        best_x0 = min(w["x0"] for w in valid_lines[best_idx])
+        best_x1 = max(w["x1"] for w in valid_lines[best_idx])
         for i in range(best_idx + 1, len(valid_lines)):
             next_top = min(w["top"] for w in valid_lines[i])
-            if next_top - curr_bottom < 15:
+            line_x0 = min(w["x0"] for w in valid_lines[i])
+            line_x1 = max(w["x1"] for w in valid_lines[i])
+            
+            # Check if there is some horizontal overlap or proximity
+            has_overlap = max(0, min(best_x1, line_x1) - max(best_x0, line_x0)) > 0
+            horiz_dist = min(abs(line_x0 - best_x0), abs(line_x1 - best_x1))
+            
+            if next_top - curr_bottom < 15 and (has_overlap or horiz_dist < 50):
                 merged_lines.append(valid_lines[i])
                 curr_bottom = max(w["bottom"] for w in valid_lines[i])
+                best_x0 = min(best_x0, line_x0)
+                best_x1 = max(best_x1, line_x1)
             else:
                 break
                 

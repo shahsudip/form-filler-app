@@ -220,7 +220,7 @@ def ocr_get_all_words(fitz_page):
         
         try:
             import pytesseract
-            data = pytesseract.image_to_data(img, lang='nep+jpn+eng', output_type=pytesseract.Output.DICT)
+            data = pytesseract.image_to_data(img, lang='jpn+eng', output_type=pytesseract.Output.DICT)
             ocr_words = []
             n_boxes = len(data['text'])
             for i in range(n_boxes):
@@ -278,7 +278,9 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
     
     words = page.get_text("words")
     if not words:
-        words = ocr_get_all_words(page)
+        if not hasattr(page, "_cached_ocr_words"):
+            page._cached_ocr_words = ocr_get_all_words(page)
+        words = page._cached_ocr_words
     left_words = []
     right_words = []
     above_words = []
@@ -287,11 +289,12 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
         wx0, wtop, wx1, wbottom, text, block_no, line_no, word_no = w
         w_cy = (wtop + wbottom) / 2
         
+        # For underlines, text often sits on top of the line, so w_cy can be much higher than ty0
         # Check left
-        if wx1 <= tx0 + 10 and ty0 - 10 <= w_cy <= ty1 + 10:
+        if wx1 <= tx0 + 10 and ty0 - 25 <= w_cy <= ty1 + 15:
             left_words.append({"x0": wx0, "top": wtop, "x1": wx1, "bottom": wbottom, "text": text})
         # Check right
-        elif wx0 >= tx1 - 10 and ty0 - 10 <= w_cy <= ty1 + 10:
+        elif wx0 >= tx1 - 10 and ty0 - 25 <= w_cy <= ty1 + 15:
             right_words.append({"x0": wx0, "top": wtop, "x1": wx1, "bottom": wbottom, "text": text})
         # Check above
         elif wbottom <= ty0 + 10 and ty0 - wbottom < max_dist_y:
@@ -557,7 +560,7 @@ def detect_fields(pdf_path: str):
             rect = [r.x0, r.y0, r.x1, r.y1]
             context = get_nearest_label(page, rect)
             if not context:
-                context = "Blank line"
+                context = ""
             detected.append({
                 "id": f"field_{field_counter}",
                 "type": "visual",

@@ -2,6 +2,108 @@ import re
 import fitz
 import pdfplumber
 
+def fallback_opencv_detect(doc):
+    import cv2
+    import numpy as np
+    from PIL import Image
+    import io
+    detected = []
+    field_counter = 0
+
+    for page_idx in range(len(doc)):
+        page = doc[page_idx]
+        mat = fitz.Matrix(2.0, 2.0)
+        pix = page.get_pixmap(matrix=mat)
+        img = Image.open(io.BytesIO(pix.tobytes("png"))).convert('RGB')
+        img_cv = np.array(img)
+        img_cv = img_cv[:, :, ::-1].copy() # RGB to BGR
+        
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        
+        kernel_length = max(10, img_cv.shape[1] // 40)
+        hori_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_length, 1))
+        img_temp1 = cv2.erode(thresh, hori_kernel, iterations=1)
+        horizontal_lines_img = cv2.dilate(img_temp1, hori_kernel, iterations=1)
+        
+        vert_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, kernel_length))
+        img_temp2 = cv2.erode(thresh, vert_kernel, iterations=1)
+        vertical_lines_img = cv2.dilate(img_temp2, vert_kernel, iterations=1)
+
+        alpha = 0.5
+        beta = 1.0 - alpha
+        img_final_bin = cv2.addWeighted(vertical_lines_img, alpha, horizontal_lines_img, beta, 0.0)
+        img_final_bin = cv2.erode(~img_final_bin, np.ones((2,2), np.uint8), iterations=2)
+        _, img_final_bin = cv2.threshold(img_final_bin, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        
+        # Horizontal lines
+        contours, _ = cv2.findContours(horizontal_lines_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours = sorted(contours, key=lambda c: cv2.boundingRect(c)[1])
+        for c in contours:
+            x, y, w, h = cv2.boundingRect(c)
+            if w > 30 and h < 15:
+                fx0, fy0, fx1, fy1 = x/2.0, y/2.0, (x+w)/2.0, (y+h)/2.0
+                rect = [fx0, fy0, fx1, fy1]
+                
+                # Check overlap with existing detected lines
+                overlaps = False
+                for d in detected:
+                    if fitz.Rect(d["rect"]).intersects(fitz.Rect(fx0, fy0 - 5, fx1, fy1 + 5)):
+                        overlaps = True
+                        break
+                if overlaps: continue
+                
+                context = get_nearest_label(page, rect)
+                if not context:
+                    # OCR left
+                    context = extract_visual_text(page, [max(0, fx0 - 150), max(0, fy0 - 10), fx0, fy1 + 10])
+                if not context:
+                    context = extract_visual_text(page, [fx0, max(0, fy0 - 25), fx1, fy0])
+                if not context:
+                    context = "Blank line"
+                    
+                detected.append({
+                    "id": f"cv_field_{field_counter}",
+                    "type": "visual",
+                    "page_index": page_idx,
+                    "rect": rect,
+                    "context": context
+                })
+                field_counter += 1
+                
+        # Boxes
+        contours_box, _ = cv2.findContours(~img_final_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for c in contours_box:
+            x, y, w, h = cv2.boundingRect(c)
+            if 20 < w < img_cv.shape[1] * 0.9 and h > 20:
+                fx0, fy0, fx1, fy1 = x/2.0, y/2.0, (x+w)/2.0, (y+h)/2.0
+                overlaps = False
+                for d in detected:
+                    if fitz.Rect(d["rect"]).intersects(fitz.Rect(fx0, fy0, fx1, fy1)):
+                        overlaps = True
+                        break
+                if not overlaps:
+                    rect = [fx0, fy0, fx1, fy1]
+                    context = get_nearest_label(page, rect)
+                    if not context:
+                        context = extract_visual_text(page, [max(0, fx0 - 150), max(0, fy0 - 10), fx0, fy1 + 10])
+                    if not context:
+                        context = extract_visual_text(page, [fx0, max(0, fy0 - 25), fx1, fy0])
+                    if not context:
+                        context = "Box"
+                        
+                    detected.append({
+                        "id": f"cv_field_{field_counter}",
+                        "type": "visual",
+                        "page_index": page_idx,
+                        "rect": rect,
+                        "context": context
+                    })
+                    field_counter += 1
+                    
+    return detected
+
+
 def extract_visual_text(fitz_page, rect):
     try:
         import pytesseract
@@ -14,8 +116,17 @@ def extract_visual_text(fitz_page, rect):
         pix = fitz_page.get_pixmap(matrix=mat, clip=clip_rect)
         img = Image.open(io.BytesIO(pix.tobytes("png")))
         
-        text = pytesseract.image_to_string(img, lang='nep+jpn+eng')
-        return text.strip()
+        try:
+            import pytesseract
+            text = pytesseract.image_to_string(img, lang='nep+jpn+eng')
+            return text.strip()
+        except Exception:
+            # Fallback to winocr for local Windows debugging
+            import winocr
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                res = executor.submit(winocr.recognize_pil_sync, img, 'ja').result()
+            return res.get("text", "").strip()
     except Exception as e:
         print("Visual OCR failed:", e)
         return ""

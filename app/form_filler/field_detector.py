@@ -445,12 +445,25 @@ def detect_fields(pdf_path: str):
                 
         # 3. Detect Underscores (___) and Dotted Lines (.....)
         underscore_rects = []
+        words = page.get_text("words")
+        current_rect = None
+        
+        # Filter words that are purely dots or underscores
+        dot_words = []
+        for w in words:
+            text = w[4]
+            if re.match(r"^[\._\-]{2,}$", text):
+                dot_words.append(fitz.Rect(w[:4]))
+                
+        # Also keep the search_for just in case of weird spacing
         matches = page.search_for("___") + page.search_for("...") + page.search_for("....") + page.search_for(".....") + page.search_for(". . .")
-        if matches:
-            matches.sort(key=lambda r: (r.y0, r.x0))
-            current_rect = None
+        for r in matches:
+            dot_words.append(fitz.Rect(r))
             
-            for r in matches:
+        if dot_words:
+            dot_words.sort(key=lambda r: (r.y0, r.x0))
+            
+            for r in dot_words:
                 # Filter out if intersects table grid or widget
                 overlaps = False
                 expanded_r = fitz.Rect(r.x0, r.y0 - 2, r.x1, r.y1 + 2)
@@ -469,7 +482,7 @@ def detect_fields(pdf_path: str):
                     current_rect = fitz.Rect(r)
                 else:
                     # Merge horizontal runs
-                    if abs(r.y0 - current_rect.y0) < 3 and r.x0 <= current_rect.x1 + 10:
+                    if abs(r.y0 - current_rect.y0) < 5 and r.x0 <= current_rect.x1 + 15:
                         current_rect.x1 = max(current_rect.x1, r.x1)
                         current_rect.y0 = min(current_rect.y0, r.y0)
                         current_rect.y1 = max(current_rect.y1, r.y1)

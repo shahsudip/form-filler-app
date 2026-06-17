@@ -274,6 +274,14 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
     Finds the nearest text block to the left or above the target_rect.
     Returns the clean label text or an empty string.
     """
+    import re
+    def clean_japanese_garbage(text):
+        if not text:
+            return text
+        # Strip all characters EXCEPT ASCII and Devanagari (keeps English and valid Nepali, removes hallucinated CJK/symbols)
+        cleaned = re.sub(r'[^\x00-\x7F\u0900-\u097F]+', '', text)
+        return cleaned.strip()
+        
     tx0, ty0, tx1, ty1 = target_rect
     t_cy = (ty0 + ty1) / 2
     
@@ -341,7 +349,7 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
         if best_label.lower() in generic_words:
             best_label = ""
         
-    return best_label
+    return clean_japanese_garbage(best_label)
 
 def get_table_label(pdfplumber_page, table_bbox, fitz_page=None):
     """
@@ -381,12 +389,11 @@ def get_table_label(pdfplumber_page, table_bbox, fitz_page=None):
         label = left_phrase or ""
         label_box = left_box
         
-    if label and label_box and fitz_page:
-        ocr_text = extract_visual_text(fitz_page, label_box)
-        if ocr_text:
-            label = ocr_text
-            
+
     if label:
+        import re
+        # Strip all characters EXCEPT ASCII and Devanagari (keeps English and valid Nepali, removes hallucinated CJK/symbols)
+        label = re.sub(r'[^\x00-\x7F\u0900-\u097F]+', '', label)
         # Clean label (e.g. remove non-ASCII characters if they are leading or trailing, or keep text)
         label = re.sub(r"__+", "", label)
         # Standard cleaning

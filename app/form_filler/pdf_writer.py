@@ -161,8 +161,12 @@ def fill_pdf(input_pdf_path: str, output_pdf_path: str, answers: list, pen_color
                 x_rl = x0 + 2
                 
                 # Convert y coordinate from top-left (PDF) to bottom-left (ReportLab)
-                # Place text baseline slightly above the visual underline (y1)
-                y_rl = height - y1 + 2.0
+                # For thin lines, place baseline slightly above the top of the line (y0).
+                # For boxes, place it near the bottom of the box (y1).
+                if is_line:
+                    y_rl = height - y0 + 1.5
+                else:
+                    y_rl = height - y1 + 2.0
                 
                 best_font = "Helvetica"
                 for ch in value:

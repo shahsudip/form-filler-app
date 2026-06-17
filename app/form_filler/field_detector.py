@@ -253,6 +253,64 @@ def get_closest_phrase(word_list, target_rect, direction='left'):
     
     return best_phrase, min_d, best_box
 
+def ocr_get_all_words(fitz_page):
+    try:
+        mat = fitz.Matrix(2.0, 2.0)
+        pix = fitz_page.get_pixmap(matrix=mat)
+        from PIL import Image
+        import io
+        img = Image.open(io.BytesIO(pix.tobytes("png"))).convert('RGB')
+        
+        try:
+            import pytesseract
+            data = pytesseract.image_to_data(img, lang='nep+jpn+eng', output_type=pytesseract.Output.DICT)
+            ocr_words = []
+            n_boxes = len(data['text'])
+            for i in range(n_boxes):
+                text = data['text'][i].strip()
+                if not text:
+                    continue
+                wx0 = data['left'][i] / 2.0
+                wtop = data['top'][i] / 2.0
+                wx1 = (data['left'][i] + data['width'][i]) / 2.0
+                wbottom = (data['top'][i] + data['height'][i]) / 2.0
+                ocr_words.append((wx0, wtop, wx1, wbottom, text, 0, 0, 0))
+            return ocr_words
+        except Exception:
+            import winocr
+            import concurrent.futures
+            
+            doc_path = ""
+            try:
+                if hasattr(fitz_page, "parent") and fitz_page.parent:
+                    doc_path = getattr(fitz_page.parent, "name", "").lower()
+            except Exception:
+                pass
+                
+            lang = 'en'
+            if any(k in doc_path for k in ['nihongo', 'jpn', 'japanese', 'n3', 'moji', 'goi']) or re.search(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]', doc_path):
+                lang = 'ja'
+                
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                res = executor.submit(winocr.recognize_pil_sync, img, lang).result()
+                
+            ocr_words = []
+            for line in res.get("lines", []):
+                for word in line.get("words", []):
+                    text = word.get("text", "").strip()
+                    if not text:
+                        continue
+                    rect = word.get("bounding_rect", {})
+                    wx0 = rect.get("x", 0.0) / 2.0
+                    wtop = rect.get("y", 0.0) / 2.0
+                    wx1 = (rect.get("x", 0.0) + rect.get("width", 0.0)) / 2.0
+                    wbottom = (rect.get("y", 0.0) + rect.get("height", 0.0)) / 2.0
+                    ocr_words.append((wx0, wtop, wx1, wbottom, text, 0, 0, 0))
+            return ocr_words
+    except Exception as e:
+        print("ocr_get_all_words failed:", e)
+        return []
+
 def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
     """
     Finds the nearest text block to the left or above the target_rect.
@@ -262,6 +320,8 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
     t_cy = (ty0 + ty1) / 2
     
     words = page.get_text("words")
+    if not words:
+        words = ocr_get_all_words(page)
     left_words = []
     right_words = []
     above_words = []

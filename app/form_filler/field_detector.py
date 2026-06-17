@@ -60,7 +60,7 @@ def fallback_opencv_detect(doc):
                 if not context:
                     context = extract_visual_text(page, [fx0, max(0, fy0 - 25), fx1, fy0])
                 if not context:
-                    context = "Blank line"
+                    context = ""
                     
                 detected.append({
                     "id": f"cv_field_{field_counter}",
@@ -90,7 +90,7 @@ def fallback_opencv_detect(doc):
                     if not context:
                         context = extract_visual_text(page, [fx0, max(0, fy0 - 25), fx1, fy0])
                     if not context:
-                        context = "Box"
+                        context = ""
                         
                     detected.append({
                         "id": f"cv_field_{field_counter}",
@@ -106,7 +106,6 @@ def fallback_opencv_detect(doc):
 
 def extract_visual_text(fitz_page, rect):
     try:
-        import pytesseract
         from PIL import Image
         import io
         
@@ -118,7 +117,7 @@ def extract_visual_text(fitz_page, rect):
         
         try:
             import pytesseract
-            text = pytesseract.image_to_string(img, lang='nep+jpn+eng')
+            text = pytesseract.image_to_string(img, lang='jpn+eng')
             return text.strip()
         except Exception:
             # Fallback to winocr for local Windows debugging
@@ -198,51 +197,9 @@ def get_closest_phrase(word_list, target_rect, direction='left'):
     if best_idx == -1:
         return None, float("inf"), None
         
-    # Expand to capture multi-line paragraphs
+    # We purposefully DO NOT expand to capture multi-line paragraphs
+    # to avoid merging huge header blocks into a single field label.
     merged_lines = [valid_lines[best_idx]]
-    
-    # Expand upwards
-    curr_top = min(w["top"] for w in valid_lines[best_idx])
-    best_x0 = min(w["x0"] for w in valid_lines[best_idx])
-    best_x1 = max(w["x1"] for w in valid_lines[best_idx])
-    for i in range(best_idx - 1, -1, -1):
-        prev_bottom = max(w["bottom"] for w in valid_lines[i])
-        line_x0 = min(w["x0"] for w in valid_lines[i])
-        line_x1 = max(w["x1"] for w in valid_lines[i])
-        
-        # Check if there is some horizontal overlap or proximity
-        has_overlap = max(0, min(best_x1, line_x1) - max(best_x0, line_x0)) > 0
-        horiz_dist = min(abs(line_x0 - best_x0), abs(line_x1 - best_x1))
-        
-        if curr_top - prev_bottom < 15 and (has_overlap or horiz_dist < 50):
-            merged_lines.insert(0, valid_lines[i])
-            curr_top = min(w["top"] for w in valid_lines[i])
-            best_x0 = min(best_x0, line_x0)
-            best_x1 = max(best_x1, line_x1)
-        else:
-            break
-            
-    # Expand downwards (if left/right)
-    if direction != 'above':
-        curr_bottom = max(w["bottom"] for w in valid_lines[best_idx])
-        best_x0 = min(w["x0"] for w in valid_lines[best_idx])
-        best_x1 = max(w["x1"] for w in valid_lines[best_idx])
-        for i in range(best_idx + 1, len(valid_lines)):
-            next_top = min(w["top"] for w in valid_lines[i])
-            line_x0 = min(w["x0"] for w in valid_lines[i])
-            line_x1 = max(w["x1"] for w in valid_lines[i])
-            
-            # Check if there is some horizontal overlap or proximity
-            has_overlap = max(0, min(best_x1, line_x1) - max(best_x0, line_x0)) > 0
-            horiz_dist = min(abs(line_x0 - best_x0), abs(line_x1 - best_x1))
-            
-            if next_top - curr_bottom < 15 and (has_overlap or horiz_dist < 50):
-                merged_lines.append(valid_lines[i])
-                curr_bottom = max(w["bottom"] for w in valid_lines[i])
-                best_x0 = min(best_x0, line_x0)
-                best_x1 = max(best_x1, line_x1)
-            else:
-                break
                 
     best_phrase = "\n".join([" ".join([w["text"] for w in line]) for line in merged_lines])
     min_x0 = min(min(w["x0"] for w in line) for line in merged_lines)
@@ -368,8 +325,17 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
 
     if best_label:
         best_label = re.sub(r"__+", "", best_label)
-        best_label = best_label.strip().rstrip(":").rstrip(" ").rstrip("-")
+        best_label = best_label.strip().rstrip(":").rstrip(" ").rstrip("-").strip()
         best_label = re.sub(r"\s+", " ", best_label)
+        
+        # Suppress generic labels
+        generic_words = {
+            "blank line", "box", "table grid", "visual", "field", "text", 
+            "textfield", "formfield", "textbox", "input", "value", "button",
+            "select", "checkbox", "radio", "underline"
+        }
+        if best_label.lower() in generic_words:
+            best_label = ""
         
     return best_label
 
@@ -632,7 +598,7 @@ def detect_fields(pdf_path: str):
             rect = [r.x0, r.y0, r.x1, r.y1]
             context = get_nearest_label(page, rect)
             if not context:
-                context = "Underline"
+                context = ""
             detected.append({
                 "id": f"field_{field_counter}",
                 "type": "visual",
@@ -676,7 +642,7 @@ def detect_fields(pdf_path: str):
             rect = [r.x0, r.y0, r.x1, r.y1]
             context = get_nearest_label(page, rect)
             if not context:
-                context = "Input box"
+                context = ""
             detected.append({
                 "id": f"field_{field_counter}",
                 "type": "visual",

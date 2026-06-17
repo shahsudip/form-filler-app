@@ -220,7 +220,7 @@ def ocr_get_all_words(fitz_page):
         
         try:
             import pytesseract
-            data = pytesseract.image_to_data(img, lang='jpn+eng', output_type=pytesseract.Output.DICT)
+            data = pytesseract.image_to_data(img, lang='nep+jpn+eng', output_type=pytesseract.Output.DICT)
             ocr_words = []
             n_boxes = len(data['text'])
             for i in range(n_boxes):
@@ -240,7 +240,8 @@ def ocr_get_all_words(fitz_page):
             doc_path = ""
             try:
                 if hasattr(fitz_page, "parent") and fitz_page.parent:
-                    doc_path = getattr(fitz_page.parent, "name", "").lower()
+                    import os
+                    doc_path = os.path.basename(getattr(fitz_page.parent, "name", "")).lower()
             except Exception:
                 pass
                 

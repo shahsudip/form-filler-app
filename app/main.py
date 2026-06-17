@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from starlette.concurrency import run_in_threadpool
 
 from app.schemas import (
     UploadResponse,
@@ -283,7 +284,7 @@ def translate_nepali(req: TranslateRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/form-filler/upload", response_model=FormFillerUploadResponse, tags=["Form Filler"])
-def form_filler_upload(file: UploadFile = File(...)):
+async def form_filler_upload(file: UploadFile = File(...)):
     """
     Uploads a PDF, runs field detection (digital, visual, character-grid),
     generates direct user-friendly questions, and caches the PDF file.
@@ -292,8 +293,8 @@ def form_filler_upload(file: UploadFile = File(...)):
         # Save file to cache (converting image to PDF if necessary)
         dest_path, filename = await _process_upload_to_pdf(file)
 
-        # Run field detection
-        detected_fields = detect_fields(dest_path)
+        # Run field detection in background thread
+        detected_fields = await run_in_threadpool(detect_fields, dest_path)
         
         # Populate history
         total_pages = get_pdf_page_count(dest_path)
@@ -345,7 +346,7 @@ def form_filler_upload(file: UploadFile = File(...)):
 
 
 @app.get("/form-filler/fields", response_model=FormFillerUploadResponse, tags=["Form Filler"])
-def form_filler_get_fields(
+async def form_filler_get_fields(
     filename: str = Query(..., description="Name of the cached PDF file to detect fields from")
 ):
     """
@@ -370,7 +371,7 @@ def form_filler_get_fields(
             pass
 
     try:
-        detected_fields = detect_fields(file_path)
+        detected_fields = await run_in_threadpool(detect_fields, file_path)
 
         fields_response = []
         for f in detected_fields:
@@ -406,7 +407,7 @@ def form_filler_get_fields(
 
 
 @app.post("/form-filler/fill", tags=["Form Filler"])
-def form_filler_fill(request: FormFillerFillRequest):
+async def form_filler_fill(request: FormFillerFillRequest):
     """
     Fills visual blanks, character-grid cells, and digital AcroForm fields in the specified PDF.
     Applies custom pen color and returns the resulting PDF file.
@@ -426,7 +427,8 @@ def form_filler_fill(request: FormFillerFillRequest):
         answers_dict = [{"field_id": a.field_id, "value": a.value} for a in request.answers]
         
         # Fill PDF
-        fill_pdf(
+        await run_in_threadpool(
+            fill_pdf,
             input_pdf_path=input_path,
             output_pdf_path=output_path,
             answers=answers_dict,

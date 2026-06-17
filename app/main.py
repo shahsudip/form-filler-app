@@ -488,6 +488,6 @@ async def suggest_field_values(request: SuggestRequest):
 
 
 # Mount Flutter Web App build folder to serve directly from the server
-WEB_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "frontend", "build", "web"))
+WEB_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "static"))
 if os.path.exists(WEB_DIR):
     app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="static")

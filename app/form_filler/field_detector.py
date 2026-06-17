@@ -275,12 +275,38 @@ def get_nearest_label(page, target_rect, max_dist_x=200, max_dist_y=60):
     Returns the clean label text or an empty string.
     """
     import re
+    _garbage_chars = set('|{}[]\\^+={}<>@#$%&*~`;/')
+    _vowels = set('aeiouAEIOU')
+    _valid_no_vowels = {'by', 'By', 'BY', 'Mr', 'Mrs', 'Dr', 'St', 'No', 'Id', 'ID', 'Ref', 'ref', 'Qty'}
+
+    def _is_english_token(tok):
+        if not tok:
+            return False
+        specials = sum(1 for c in tok if c in _garbage_chars)
+        if specials > 0:
+            return False
+        letters = sum(1 for c in tok if c.isalpha())
+        if letters == 0:
+            return False
+        # All digits or digits with punctuation are ok (e.g. account numbers, dates)
+        if all(c.isdigit() or c in '.,-/' for c in tok):
+            return True
+        # Preeti garbage is mostly consonant clusters with no vowels
+        has_vowel = any(c in _vowels for c in tok)
+        if not has_vowel and tok not in _valid_no_vowels and len(tok) > 2:
+            return False
+        return True
+
     def clean_japanese_garbage(text):
         if not text:
             return text
-        # Strip all characters EXCEPT ASCII and Devanagari (keeps English and valid Nepali, removes hallucinated CJK/symbols)
-        cleaned = re.sub(r'[^\x00-\x7F\u0900-\u097F]+', '', text)
-        return cleaned.strip()
+        # Remove non-ASCII non-Devanagari unicode
+        text = re.sub(r'[^\x00-\x7F\u0900-\u097F]+', '', text).strip()
+        # Filter Preeti-encoded garbage (legacy Nepali font ASCII chars like k|fylds, vftf, g+=)
+        tokens = text.split()
+        english_tokens = [tok for tok in tokens if _is_english_token(tok)]
+        result = ' '.join(english_tokens).strip()
+        return result if result else text
         
     tx0, ty0, tx1, ty1 = target_rect
     t_cy = (ty0 + ty1) / 2
@@ -392,11 +418,28 @@ def get_table_label(pdfplumber_page, table_bbox, fitz_page=None):
 
     if label:
         import re
-        # Strip all characters EXCEPT ASCII and Devanagari (keeps English and valid Nepali, removes hallucinated CJK/symbols)
+        _garbage_chars = set('|{}[]\\^+={}<>@#$%&*~`;/')
+        _vowels = set('aeiouAEIOU')
+        _valid_no_vowels = {'by', 'By', 'BY', 'Mr', 'Mrs', 'Dr', 'St', 'No', 'Id', 'ID', 'Ref', 'ref', 'Qty'}
         label = re.sub(r'[^\x00-\x7F\u0900-\u097F]+', '', label)
-        # Clean label (e.g. remove non-ASCII characters if they are leading or trailing, or keep text)
+        tokens = label.split()
+        english_tokens = []
+        for tok in tokens:
+            if not tok:
+                continue
+            specials = sum(1 for c in tok if c in _garbage_chars)
+            if specials > 0:
+                continue
+            letters = sum(1 for c in tok if c.isalpha())
+            if letters == 0:
+                continue
+            has_vowel = any(c in _vowels for c in tok)
+            if not has_vowel and tok not in _valid_no_vowels and len(tok) > 2:
+                continue
+            english_tokens.append(tok)
+        if english_tokens:
+            label = ' '.join(english_tokens)
         label = re.sub(r"__+", "", label)
-        # Standard cleaning
         label = label.strip().rstrip(":").rstrip(" ").rstrip("-").strip()
             
     return label or "Table Grid"

@@ -14,7 +14,7 @@ def extract_visual_text(fitz_page, rect):
         pix = fitz_page.get_pixmap(matrix=mat, clip=clip_rect)
         img = Image.open(io.BytesIO(pix.tobytes("png")))
         
-        text = pytesseract.image_to_string(img, lang='jpn+eng')
+        text = pytesseract.image_to_string(img, lang='nep+jpn+eng')
         return text.strip()
     except Exception as e:
         print("Visual OCR failed:", e)

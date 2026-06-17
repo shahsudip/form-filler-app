@@ -210,18 +210,18 @@ async def get_page_text(
                         clip_left = fitz.Rect(0, 0, w / 2, h)
                         pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
                         img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
-                        text_left = pytesseract.image_to_string(img_left, lang='jpn+eng')
+                        text_left = pytesseract.image_to_string(img_left, lang='nep+jpn+eng')
 
                         clip_right = fitz.Rect(w / 2, 0, w, h)
                         pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
                         img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
-                        text_right = pytesseract.image_to_string(img_right, lang='jpn+eng')
+                        text_right = pytesseract.image_to_string(img_right, lang='nep+jpn+eng')
 
                         text = f"{text_left.strip()}\n\n{text_right.strip()}"
                     else:
                         pix = page.get_pixmap(matrix=mat)
                         img = Image.open(io.BytesIO(pix.tobytes("png")))
-                        text = pytesseract.image_to_string(img, lang='jpn+eng').strip()
+                        text = pytesseract.image_to_string(img, lang='nep+jpn+eng').strip()
 
                     return {"text": text}
             except Exception as ocr_err:

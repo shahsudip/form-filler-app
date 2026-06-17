@@ -230,25 +230,33 @@ def get_page_text(
                         # Fallback to winocr for local Windows debugging
                         import winocr
                         import concurrent.futures
+                        
+                        # Detect language from file_path
+                        doc_path = file_path.lower() if 'file_path' in locals() else ""
+                        lang = 'en'
+                        import re
+                        if any(k in doc_path for k in ['nihongo', 'jpn', 'japanese', 'n3', 'moji', 'goi']) or re.search(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]', doc_path):
+                            lang = 'ja'
+                            
                         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                             if w > h:
                                 clip_left = fitz.Rect(0, 0, w / 2, h)
                                 pix_left = page.get_pixmap(matrix=mat, clip=clip_left)
                                 img_left = Image.open(io.BytesIO(pix_left.tobytes("png")))
-                                res_left = executor.submit(winocr.recognize_pil_sync, img_left, 'ja').result()
+                                res_left = executor.submit(winocr.recognize_pil_sync, img_left, lang).result()
                                 text_left = res_left.get("text", "")
 
                                 clip_right = fitz.Rect(w / 2, 0, w, h)
                                 pix_right = page.get_pixmap(matrix=mat, clip=clip_right)
                                 img_right = Image.open(io.BytesIO(pix_right.tobytes("png")))
-                                res_right = executor.submit(winocr.recognize_pil_sync, img_right, 'ja').result()
+                                res_right = executor.submit(winocr.recognize_pil_sync, img_right, lang).result()
                                 text_right = res_right.get("text", "")
 
                                 text = f"{text_left.strip()}\n\n{text_right.strip()}"
                             else:
                                 pix = page.get_pixmap(matrix=mat)
                                 img = Image.open(io.BytesIO(pix.tobytes("png")))
-                                res = executor.submit(winocr.recognize_pil_sync, img, 'ja').result()
+                                res = executor.submit(winocr.recognize_pil_sync, img, lang).result()
                                 text = res.get("text", "").strip()
 
                     return {"text": text}

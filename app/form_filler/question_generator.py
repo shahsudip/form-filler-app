@@ -65,8 +65,22 @@ def generate_fallback_question(field_name: str, context: str) -> str:
     except Exception as e:
         print(f"Translation failed: {e}")
     
-    # Check if context matches common patterns (longest keys first)
+    # Check for direct Japanese matches (using unicode escape sequences to prevent source file corruption)
     ctx_lower = clean_ctx.lower()
+    if "\u6c0f\u540d" in ctx_lower or "\u304a\u540d\u524d" in ctx_lower:
+        return "What is your full name?"
+    if "\u751f\u5e74\u6708\u65e5" in ctx_lower:
+        return "What is your date of birth?"
+    if "\u4f4f\u6240" in ctx_lower:
+        return "What is your address?"
+    if "\u96fb\u8a71\u756a\u53f7" in ctx_lower or "\u9023\u7d61\u5148" in ctx_lower:
+        return "What is your phone number?"
+    if "\u53e3\u5ea7\u756a\u53f7" in ctx_lower:
+        return "What is the account number?"
+    if "\u30d5\u30ea\u30ac\u30ca" in ctx_lower or "\u3075\u308a\u304c\u306a" in ctx_lower:
+        return "What is the pronunciation (Furigana)?"
+
+    # Check if context matches common patterns (longest keys first)
     sorted_keys = sorted(COMMON_FIELD_MAPPINGS.keys(), key=len, reverse=True)
     for key in sorted_keys:
         val = COMMON_FIELD_MAPPINGS[key]
@@ -86,6 +100,15 @@ def generate_fallback_question(field_name: str, context: str) -> str:
     # General conversion:
     # If we have a good context, build "What is your [context]?"
     if clean_ctx and len(clean_ctx) > 1:
+        # If it still contains non-ASCII characters (failed translation), do not output Japanese to the chat!
+        if re.search(r'[^\x00-\x7F]', clean_ctx):
+            if field_name and not re.search(r'[^\x00-\x7F]', field_name):
+                spaced_name = re.sub(r"([a-z])([A-Z])", r"\1 \2", field_name)
+                spaced_name = spaced_name.replace("_", " ").replace("-", " ")
+                spaced_name = spaced_name.strip().capitalize()
+                return f"Please enter: {spaced_name}"
+            return "Please fill in this field."
+            
         # Avoid double 'what' or 'please'
         if clean_ctx.lower().startswith("what") or clean_ctx.lower().startswith("please") or clean_ctx.lower().startswith("enter"):
             return clean_ctx if clean_ctx.endswith("?") or clean_ctx.endswith(".") else clean_ctx + "?"

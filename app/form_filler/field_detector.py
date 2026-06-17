@@ -124,8 +124,21 @@ def extract_visual_text(fitz_page, rect):
             # Fallback to winocr for local Windows debugging
             import winocr
             import concurrent.futures
+            
+            # Detect language from document path/name
+            doc_path = ""
+            try:
+                if hasattr(fitz_page, "parent") and fitz_page.parent:
+                    doc_path = getattr(fitz_page.parent, "name", "").lower()
+            except Exception:
+                pass
+                
+            lang = 'en'
+            if any(k in doc_path for k in ['nihongo', 'jpn', 'japanese', 'n3', 'moji', 'goi']) or re.search(r'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]', doc_path):
+                lang = 'ja'
+                
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                res = executor.submit(winocr.recognize_pil_sync, img, 'ja').result()
+                res = executor.submit(winocr.recognize_pil_sync, img, lang).result()
             return res.get("text", "").strip()
     except Exception as e:
         print("Visual OCR failed:", e)

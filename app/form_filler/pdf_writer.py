@@ -11,13 +11,22 @@ from app.form_filler.field_detector import detect_fields
 has_japanese = False
 has_nepali = False
 
-if os.path.exists("C:/Windows/Fonts/msgothic.ttc"):
-    pdfmetrics.registerFont(TTFont("JapaneseFont", "C:/Windows/Fonts/msgothic.ttc", subfontIndex=0))
-    has_japanese = True
+jap_fonts = ["C:/Windows/Fonts/msgothic.ttc", "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf"]
+for path in jap_fonts:
+    if os.path.exists(path):
+        if path.endswith(".ttc"):
+            pdfmetrics.registerFont(TTFont("JapaneseFont", path, subfontIndex=0))
+        else:
+            pdfmetrics.registerFont(TTFont("JapaneseFont", path))
+        has_japanese = True
+        break
 
-if os.path.exists("C:/Windows/Fonts/Nirmala.ttf"):
-    pdfmetrics.registerFont(TTFont("NepaliFont", "C:/Windows/Fonts/Nirmala.ttf"))
-    has_nepali = True
+nep_fonts = ["C:/Windows/Fonts/Nirmala.ttf", "/usr/share/fonts/truetype/lohit-devanagari/Lohit-Devanagari.ttf", "/usr/share/fonts/truetype/fonts-deva.ttf"]
+for path in nep_fonts:
+    if os.path.exists(path):
+        pdfmetrics.registerFont(TTFont("NepaliFont", path))
+        has_nepali = True
+        break
 
 def get_font_for_char(char: str) -> str:
     """Returns the best font name based on the Unicode point of the character."""

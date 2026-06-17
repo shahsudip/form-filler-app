@@ -5,6 +5,8 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-jpn \
+    fonts-ipafont-gothic \
+    fonts-lohit-deva \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory to /app

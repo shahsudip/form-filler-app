@@ -32,7 +32,16 @@ COMMON_FIELD_MAPPINGS = {
     "title": "What is your title?",
     "company": "What is your company name?",
     "occupation": "What is your occupation?",
-    "job_title": "What is your job title?"
+    "job_title": "What is your job title?",
+    "account holder's nepali name": "What is the account holder's Nepali name?",
+    "account holder nepali name": "What is the account holder's Nepali name?",
+    "name in nepali": "What is the account holder's Nepali name?",
+    "nepali name": "What is the account holder's Nepali name?",
+    "account holder's name in nepali": "What is the account holder's Nepali name?",
+    "account holder name in nepali": "What is the account holder's Nepali name?",
+    "name (in nepali)": "What is the account holder's Nepali name?",
+    "name in devanagari": "What is the account holder's Nepali name?",
+    "name (in devanagari)": "What is the account holder's Nepali name?"
 }
 
 # Add more specific phrases to COMMON_FIELD_MAPPINGS
